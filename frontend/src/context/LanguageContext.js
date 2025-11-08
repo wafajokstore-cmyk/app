@@ -80,15 +80,11 @@ export const LanguageProvider = ({ children }) => {
 
   const translateText = async (text, targetLang = 'id') => {
     try {
-      const response = await axios.post('https://libretranslate.com/translate', {
-        q: text,
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const response = await axios.post(`${BACKEND_URL}/api/translate`, {
+        text: text,
         source: 'en',
-        target: targetLang,
-        format: 'text'
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        target: targetLang
       });
       return response.data.translatedText;
     } catch (error) {
