@@ -1,9 +1,6 @@
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
 
 export default function Footer() {
-  const { t } = useLanguage();
-
   const socialLinks = [
     { name: 'TikTok', url: 'https://tiktok.com/@shindoranesub' },
     { name: 'Facebook', url: 'https://www.facebook.com/p/ShinDora-Nesub-61567024627372/' },
@@ -18,73 +15,73 @@ export default function Footer() {
   ];
 
   const infoLinks = [
-    { label: t('aboutUs'), path: '/about' },
-    { label: t('disclaimer'), path: '/disclaimer' },
-    { label: t('privacy'), path: '/privacy' },
-    { label: t('terms'), path: '/terms' },
+    { label: 'About', path: '/about' },
+    { label: 'Disclaimer', path: '/disclaimer' },
+    { label: 'Privacy', path: '/privacy' },
+    { label: 'Terms', path: '/terms' },
   ];
 
   return (
     <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-16 smooth-transition" data-testid="footer">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Follow Us */}
-          <div>
-            <h3 className="font-semibold text-lg mb-4">{t('followUs')}:</h3>
-            <div className="flex flex-wrap gap-3">
-              {socialLinks.map((link) => (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+          {/* Follow */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-semibold">Follow:</span>
+            {socialLinks.map((link, index) => (
+              <span key={link.name}>
                 <a
-                  key={link.name}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full text-sm font-medium smooth-transition border border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500"
+                  className="hover:text-blue-500 dark:hover:text-blue-400 smooth-transition"
                   data-testid={`social-${link.name.toLowerCase()}`}
                 >
                   {link.name}
                 </a>
-              ))}
-            </div>
+                {index < socialLinks.length - 1 && <span className="ml-2">|</span>}
+              </span>
+            ))}
           </div>
 
-          {/* Support Us */}
-          <div>
-            <h3 className="font-semibold text-lg mb-4">{t('supportUs')}:</h3>
-            <div className="flex flex-wrap gap-3">
-              {supportLinks.map((link) => (
+          {/* Support */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-semibold">Support:</span>
+            {supportLinks.map((link, index) => (
+              <span key={link.name}>
                 <a
-                  key={link.name}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full text-sm font-medium smooth-transition border border-gray-300 dark:border-gray-700 hover:border-green-500 dark:hover:border-green-500"
+                  className="hover:text-green-500 dark:hover:text-green-400 smooth-transition"
                   data-testid={`support-${link.name.toLowerCase()}`}
                 >
                   {link.name}
                 </a>
-              ))}
-            </div>
+                {index < supportLinks.length - 1 && <span className="ml-2">|</span>}
+              </span>
+            ))}
           </div>
 
-          {/* Info Pages */}
-          <div>
-            <h3 className="font-semibold text-lg mb-4">Info:</h3>
-            <div className="space-y-2">
-              {infoLinks.map((link) => (
+          {/* Links */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-semibold">Link:</span>
+            {infoLinks.map((link, index) => (
+              <span key={link.path}>
                 <Link
-                  key={link.path}
                   to={link.path}
-                  className="block text-sm hover:text-blue-500 dark:hover:text-blue-400 smooth-transition"
+                  className="hover:text-blue-500 dark:hover:text-blue-400 smooth-transition"
                   data-testid={`info-${link.path.substring(1)}`}
                 >
                   {link.label}
                 </Link>
-              ))}
-            </div>
+                {index < infoLinks.length - 1 && <span className="ml-2">|</span>}
+              </span>
+            ))}
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 text-center text-xs text-gray-500 dark:text-gray-500">
           <p>© 2025 ShinDora Nesub. All rights reserved.</p>
         </div>
       </div>
