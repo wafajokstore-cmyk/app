@@ -113,13 +113,6 @@ export const LanguageProvider = ({ children }) => {
     localStorage.setItem('language', language);
   }, [language]);
 
-  useEffect(() => {
-    // Auto-translate to Indonesian on mount if cache is empty
-    if (language === 'id' && Object.keys(translationCache).length === 0) {
-      translateAll();
-    }
-  }, []);
-
   const translateText = async (text, targetLang = 'id') => {
     try {
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -133,20 +126,6 @@ export const LanguageProvider = ({ children }) => {
       console.error('Translation error:', error);
       return text; // Fallback to original text
     }
-  };
-
-  const translateAll = async () => {
-    const keys = Object.keys(baseTranslations.en);
-    const newCache = {};
-    
-    for (const key of keys) {
-      const text = baseTranslations.en[key];
-      const translated = await translateText(text, 'id');
-      newCache[key] = translated;
-    }
-    
-    setTranslationCache(newCache);
-    localStorage.setItem('idTranslations', JSON.stringify(newCache));
   };
 
   const toggleLanguage = () => {
