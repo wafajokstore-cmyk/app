@@ -98,6 +98,14 @@ class AdminLogin(BaseModel):
 class AdminResponse(BaseModel):
     token: str
 
+class TranslateRequest(BaseModel):
+    text: str
+    source: str = "en"
+    target: str = "id"
+
+class TranslateResponse(BaseModel):
+    translatedText: str
+
 # Helper function to verify admin
 def verify_admin(authorization: Optional[str] = None):
     if not authorization or authorization != f"Bearer {hashlib.sha256(ADMIN_PASSWORD.encode()).hexdigest()}":
@@ -107,6 +115,27 @@ def verify_admin(authorization: Optional[str] = None):
 @api_router.get("/")
 async def root():
     return {"message": "ShinDoraNesub API"}
+
+# Translation endpoint (proxy to LibreTranslate)
+@api_router.post("/translate", response_model=TranslateResponse)
+async def translate(request: TranslateRequest):
+    import requests
+    try:
+        response = requests.post(
+            "https://libretranslate.com/translate",
+            json={
+                "q": request.text,
+                "source": request.source,
+                "target": request.target,
+                "format": "text"
+            },
+            headers={"Content-Type": "application/json"}
+        )
+        data = response.json()
+        return {"translatedText": data.get("translatedText", request.text)}
+    except Exception as e:
+        logger.error(f"Translation error: {e}")
+        return {"translatedText": request.text}
 
 # Admin login
 @api_router.post("/admin/login", response_model=AdminResponse)
