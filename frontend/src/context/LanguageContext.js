@@ -53,8 +53,53 @@ const baseTranslations = {
   }
 };
 
-// Indonesian translations cache
-const idTranslations = {};
+// Indonesian translations (pre-translated for better accuracy)
+const idTranslations = {
+  home: 'Beranda',
+  trending: 'Trending',
+  watchLater: 'Tonton Nanti',
+  likedVideos: 'Video Disukai',
+  autoplay: 'Putar Otomatis',
+  allCategories: 'Semua Kategori',
+  search: 'Cari video...',
+  views: 'tayangan',
+  episode: 'Episode',
+  category: 'Kategori',
+  description: 'Deskripsi',
+  noVideos: 'Tidak ada video',
+  loading: 'Memuat...',
+  previous: 'Sebelumnya',
+  next: 'Selanjutnya',
+  upNext: 'Selanjutnya',
+  autoplayEnabled: 'Putar Otomatis Aktif',
+  autoplayDisabled: 'Putar Otomatis Nonaktif',
+  admin: 'Panel Admin',
+  login: 'Masuk',
+  password: 'Kata Sandi',
+  logout: 'Keluar',
+  addVideo: 'Tambah Video',
+  editVideo: 'Edit Video',
+  deleteVideo: 'Hapus Video',
+  addCategory: 'Tambah Kategori',
+  title: 'Judul',
+  embedUrl: 'URL Embed',
+  thumbnail: 'Thumbnail',
+  save: 'Simpan',
+  cancel: 'Batal',
+  delete: 'Hapus',
+  edit: 'Edit',
+  themeSettings: 'Pengaturan Tema',
+  primaryColor: 'Warna Utama',
+  darkBackground: 'Latar Gelap',
+  lightBackground: 'Latar Terang',
+  textColor: 'Warna Teks',
+  resetToDefault: 'Reset ke Default',
+  uploadLogo: 'Upload Logo',
+  manageCategories: 'Kelola Kategori',
+  manageVideos: 'Kelola Video',
+  categoryName: 'Nama Kategori',
+  categorySlug: 'Slug Kategori'
+};
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => {
@@ -62,10 +107,7 @@ export const LanguageProvider = ({ children }) => {
     return saved || 'id';
   });
 
-  const [translationCache, setTranslationCache] = useState(() => {
-    const cached = localStorage.getItem('idTranslations');
-    return cached ? JSON.parse(cached) : {};
-  });
+  const [translationCache] = useState(idTranslations);
 
   useEffect(() => {
     localStorage.setItem('language', language);
