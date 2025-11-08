@@ -1,8 +1,10 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
 const LanguageContext = createContext();
 
-const translations = {
+// Base translations (English as source)
+const baseTranslations = {
   en: {
     home: 'Home',
     trending: 'Trending',
@@ -22,12 +24,6 @@ const translations = {
     upNext: 'Up Next',
     autoplayEnabled: 'Autoplay Enabled',
     autoplayDisabled: 'Autoplay Disabled',
-    followUs: 'Follow ShinDoraNesub',
-    supportUs: 'Support Us',
-    aboutUs: 'About Us',
-    disclaimer: 'Disclaimer',
-    privacy: 'Privacy Policy',
-    terms: 'Terms & Conditions',
     admin: 'Admin Panel',
     login: 'Login',
     password: 'Password',
@@ -54,60 +50,11 @@ const translations = {
     manageVideos: 'Manage Videos',
     categoryName: 'Category Name',
     categorySlug: 'Category Slug'
-  },
-  id: {
-    home: 'Beranda',
-    trending: 'Trending',
-    watchLater: 'Tonton Nanti',
-    likedVideos: 'Video Disukai',
-    autoplay: 'Putar Otomatis',
-    allCategories: 'Semua Kategori',
-    search: 'Cari video...',
-    views: 'tayangan',
-    episode: 'Episode',
-    category: 'Kategori',
-    description: 'Deskripsi',
-    noVideos: 'Tidak ada video',
-    loading: 'Memuat...',
-    previous: 'Sebelumnya',
-    next: 'Selanjutnya',
-    upNext: 'Selanjutnya',
-    autoplayEnabled: 'Putar Otomatis Aktif',
-    autoplayDisabled: 'Putar Otomatis Nonaktif',
-    followUs: 'Ikuti ShinDoraNesub',
-    supportUs: 'Dukung Kami',
-    aboutUs: 'Tentang Kami',
-    disclaimer: 'Penafian',
-    privacy: 'Kebijakan Privasi',
-    terms: 'Syarat & Ketentuan',
-    admin: 'Panel Admin',
-    login: 'Masuk',
-    password: 'Kata Sandi',
-    logout: 'Keluar',
-    addVideo: 'Tambah Video',
-    editVideo: 'Edit Video',
-    deleteVideo: 'Hapus Video',
-    addCategory: 'Tambah Kategori',
-    title: 'Judul',
-    embedUrl: 'URL Embed',
-    thumbnail: 'Thumbnail',
-    save: 'Simpan',
-    cancel: 'Batal',
-    delete: 'Hapus',
-    edit: 'Edit',
-    themeSettings: 'Pengaturan Tema',
-    primaryColor: 'Warna Utama',
-    darkBackground: 'Latar Gelap',
-    lightBackground: 'Latar Terang',
-    textColor: 'Warna Teks',
-    resetToDefault: 'Reset ke Default',
-    uploadLogo: 'Upload Logo',
-    manageCategories: 'Kelola Kategori',
-    manageVideos: 'Kelola Video',
-    categoryName: 'Nama Kategori',
-    categorySlug: 'Slug Kategori'
   }
 };
+
+// Indonesian translations cache
+const idTranslations = {};
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => {
@@ -115,20 +62,70 @@ export const LanguageProvider = ({ children }) => {
     return saved || 'id';
   });
 
+  const [translationCache, setTranslationCache] = useState(() => {
+    const cached = localStorage.getItem('idTranslations');
+    return cached ? JSON.parse(cached) : {};
+  });
+
   useEffect(() => {
     localStorage.setItem('language', language);
   }, [language]);
+
+  useEffect(() => {
+    // Auto-translate to Indonesian on mount if cache is empty
+    if (language === 'id' && Object.keys(translationCache).length === 0) {
+      translateAll();
+    }
+  }, []);
+
+  const translateText = async (text, targetLang = 'id') => {
+    try {
+      const response = await axios.post('https://libretranslate.com/translate', {
+        q: text,
+        source: 'en',
+        target: targetLang,
+        format: 'text'
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data.translatedText;
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text; // Fallback to original text
+    }
+  };
+
+  const translateAll = async () => {
+    const keys = Object.keys(baseTranslations.en);
+    const newCache = {};
+    
+    for (const key of keys) {
+      const text = baseTranslations.en[key];
+      const translated = await translateText(text, 'id');
+      newCache[key] = translated;
+    }
+    
+    setTranslationCache(newCache);
+    localStorage.setItem('idTranslations', JSON.stringify(newCache));
+  };
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'id' : 'en');
   };
 
   const t = (key) => {
-    return translations[language][key] || key;
+    if (language === 'en') {
+      return baseTranslations.en[key] || key;
+    }
+    
+    // Return cached Indonesian translation or English fallback
+    return translationCache[key] || baseTranslations.en[key] || key;
   };
 
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+    <LanguageContext.Provider value={{ language, toggleLanguage, t, translateText }}>
       {children}
     </LanguageContext.Provider>
   );
